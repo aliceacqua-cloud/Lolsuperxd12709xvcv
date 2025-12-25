@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Sorpresa 🎁</title>
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      color: #fff;
+    }
+    img {
+      max-width: 100%;
+      max-height: calc(100vh - 120px); /* lascia spazio per il bottone */
+      object-fit: contain;
+      background: #111;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<img id="meme" alt="Meme casuale" role="img" aria-live="polite">
+<button id="altro" type="button">Altro meme</button>
+
+<script>
+  const totaleImmagini = 107; // numero totale file
+  const img = document.getElementById("meme");
+  const btn = document.getElementById("altro");
+  const estensioni = ['jpeg', 'jpg', 'png']; // ordine di prova
+
+  if (!img) {
+    console.error("Elemento <img id='meme'> non trovato nella pagina.");
+  } else {
+    img.dataset.attempt = 0;
+    img.dataset.base = '';
+
+    // Usa il numero senza zeri iniziali (es. "1", "2", "10")
+    function setImgSrc(numero) {
+      const nome = String(numero); // NO padStart perché i file non hanno zeri iniziali
+      const base = `immagini/${nome}`;
+      img.dataset.base = base;
+      img.dataset.attempt = 0;
+      img.alt = `Meme numero ${numero}`;
+      img.src = `${base}.${estensioni[0]}`;
+    }
+
+    img.addEventListener('error', () => {
+      const attempt = Number(img.dataset.attempt || 0);
+      const base = img.dataset.base || '';
+      if (!base) return;
+
+      if (attempt < estensioni.length - 1) {
+        const next = attempt + 1;
+        img.dataset.attempt = next;
+        img.src = `${base}.${estensioni[next]}`;
+      } else {
+        // tutte le estensioni fallite -> fallback
+        img.removeAttribute('src');
+        img.alt = "Immagine non disponibile";
+        // opzionale: impostare un'immagine di fallback locale:
+        // img.src = 'immagini/fallback.png';
+      }
+    });
+
+    function nuovoMeme() {
+      const numeroRandom = Math.floor(Math.random() * totaleImmagini) + 1; // 1..totaleImmagini
+      setImgSrc(numeroRandom);
+    }
+
+    btn.addEventListener('click', nuovoMeme);
+
+    // mostra un meme appena si apre la pagina
+    nuovoMeme();
+  }
+</script>
+
+</body>
+</html>
